@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GuestBook</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <div class="container">
+
+      <nav class="navbar navbar-default">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="/">GuestBook For Test</a>
+          </div>
+          <ul class="nav navbar-nav">
+            <li <?php if($controller == core\Controller::MAINPAGE) echo "class='active'"; ?>><a href="/">Home</a></li>
+            <li <?php if($controller == core\Controller::GUESTBOOK) echo "class='active'"; ?>><a href="/guestbook">GuestBook</a></li>
+            <li <?php if($controller == core\Controller::SECURITY) echo "class='active'"; ?>><a href="/security/<?php echo core\Service::getService()->isAuthenticated() ? 'logout' : 'login'; ?>"><?php echo core\Service::getService()->isAuthenticated() ? 'Logout' : 'Login'; ?></a></li>
+          </ul>
+        </div>
+      </nav>
+      <?php include($content_path); ?>  
+      </div>
+  </body>
+</html>

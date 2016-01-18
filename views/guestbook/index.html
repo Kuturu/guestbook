@@ -1,0 +1,93 @@
+<?php
+    $collapse_in = '';
+    $action = "/guestbook/add";
+    $button_text = "Write new message";
+    if(is_array($params['message'])){ 
+        $valid_errs = $params['message'];
+        $params['message'] = null;
+        $collapse_in = 'in';
+    } elseif ($params['message'] instanceof models\GuestbookModel) {
+        $edit_data = $params['message'];
+        $params['message'] = null;
+        $collapse_in = 'in';
+        $action = "/guestbook/edit/" . $edit_data->id;
+        $button_text = "Edit message";
+    } 
+    if($params['model_data'] instanceof models\GuestbookModel) {
+        $edit_data = $params['model_data'];
+    }
+?>
+
+      <button class="btn btn-info" data-toggle="collapse" data-target="#guestbookForm"><?php echo $button_text ?></button>
+      <form role="form" method="post" action="<?php echo $action ?>" class="collapse <?php echo $collapse_in ?>" id="guestbookForm">
+        <p><span class="text-danger">* required field.</span></p>
+        <div class="form-group">
+          <label>Name:</label><span class="text-danger"> * <?php if(isset($valid_errs) && array_key_exists('name', $valid_errs)) echo $valid_errs['name']; ?></span>
+          <input name="name" type="text" class="form-control" placeholder="Enter your name" value="<?php if(isset($edit_data)) echo $edit_data->name; ?>" required>
+        </div>
+        <div class="form-group">
+          <label>Email address:</label><span class="text-danger"> * <?php if(isset($valid_errs) && array_key_exists('email', $valid_errs)) echo $valid_errs['email']; ?></span>
+          <input name="email" type="email" class="form-control" placeholder="Enter your e-mail" value="<?php if(isset($edit_data)) echo $edit_data->email; ?>" required>      
+        </div>
+        <div class="form-group">
+          <label>Website:</label><span class="text-danger"> <?php if(isset($valid_errs) && array_key_exists('website', $valid_errs)) echo $valid_errs['website']; ?></span>
+          <input name="website" type="text" class="form-control" placeholder="Enter your website address" value="<?php if(isset($edit_data)) echo $edit_data->website; ?>">
+        </div>
+        <div class="form-group">
+          <label>Text:</label><span class="text-danger"> * <?php if(isset($valid_errs) && array_key_exists('content', $valid_errs)) echo $valid_errs['content']; ?></span>
+          <textarea name="content" class="form-control" placeholder="Enter text" required><?php if(isset($edit_data)) echo $edit_data->content; ?></textarea>
+        </div>
+        <div class="form-group">
+            <img src="/captcha/button.php" ><span class="text-danger"> * <?php if(isset($valid_errs) && array_key_exists('captcha', $valid_errs)) echo $valid_errs['captcha']; ?></span>
+            <input name="captcha" type="text" class="form-control" placeholder="Enter captcha" required>    
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+      </form>
+      
+      <?php 
+            if(!($params['message'] === null)){ 
+                echo "<div class='alert alert-success'><strong>";
+                echo $params['message'];
+                echo "</strong></div>";
+            }
+      ?>
+      <table class="table">
+        <thead>
+          <tr>
+            <th><a href='/guestbook/orderby/date/asc'><span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span></a>&nbsp;Date&nbsp;<a href='/guestbook/orderby/date/desc'><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span></a></th>
+            <th><a href='/guestbook/orderby/name/asc'><span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span></a>&nbsp;Name&nbsp;<a href='/guestbook/orderby/name/desc'><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span></a></th>
+            <th><a href='/guestbook/orderby/email/asc'><span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span></a>&nbsp;Email&nbsp;<a href='/guestbook/orderby/email/desc'><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span></a></th>
+            <th>Website</th>
+            <th>Text</th>
+            <?php if(core\Service::getService()->isAuthenticated()) echo "<th>Admin</th>" ?>
+          </tr>
+        </thead>
+        <tbody>
+        <?php
+            foreach ($model_arr as $model) {
+                echo "<tr>";
+                echo "<td>" . htmlspecialchars($model->date) . "</td>";
+                echo "<td>" . htmlspecialchars($model->name) . "</td>";
+                echo "<td>" . htmlspecialchars($model->email) . "</td>";
+                echo "<td>" . htmlspecialchars($model->website) . "</td>";
+                echo "<td>" . htmlspecialchars($model->content) . "</td>";
+                if(core\Service::getService()->isAuthenticated()){ 
+                    echo "<td><a href='/guestbook/edit/$model->id'><button type='button' class='btn btn-warning'>Edit</button></a>";
+                    echo "<a class='btn btn-danger' href='/guestbook/delete/$model->id'><span class='glyphicon glyphicon-trash' aria-hidden='true'></span>&nbsp;Delete</a>" . "</td>";
+                    echo "</tr>";
+                }
+            }
+        ?>
+        </tbody>
+      </table>
+
+      <ul class="pagination">
+        <?php
+            for ($i = 1; $i <= $params['pages']; $i++) {
+                echo "<li ";
+                if($params['active_page'] == $i) echo "class='active'";
+                echo "><a href='/guestbook/$i'>$i</a></li>";
+            }
+        ?>
+        
+      </ul>
